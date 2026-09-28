@@ -46,7 +46,7 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/Logo.png')} style={styles.logo} />
+      <Image source={require('../assets/logo.jpg')} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Iniciar sesión</Text>
 
       <Text style={styles.label}>Correo</Text>
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   logo: {
-    width: 100,
+    width: '85%',
     height: 100,
     marginBottom: 20,
   },
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   button: {
-    backgroundColor: '#922b21',
+    backgroundColor: 'rgb(41, 61, 85)',
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderRadius: 5,

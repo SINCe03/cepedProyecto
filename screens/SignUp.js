@@ -71,7 +71,7 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\s\S]{8
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      <Image source={require('../assets/logo.jpg')} style={styles.logo} resizeMode="contain"/>
       <Text style={styles.title}>Regístrate</Text>
 
       <Text style={styles.label}>Nombre</Text>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   logo: {
-    width: 100,
+    width: '85%',
     height: 100,
     marginBottom: 10,
   },
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   button: {
-    backgroundColor: '#922b21',
+    backgroundColor: 'rgb(41, 61, 85)',
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderRadius: 5,
