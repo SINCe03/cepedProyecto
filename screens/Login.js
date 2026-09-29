@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../src/config/firebaseConfig';
+import { auth, db } from '../src/config/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
@@ -15,10 +16,12 @@ export default function Login({ navigation }) {
       return;
     }
 
-    try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      Alert.alert("Login exitoso", "Has iniciado sesión correctamente.");
-      // El observador de Firebase cambia la pantalla al detectar la sesión.
+        try {
+      const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const snap = await getDoc(doc(db, 'usuarios', credential.user.uid));
+      const rol = snap.exists() ? snap.data().rol : 'usuario';
+      // El observador de Firebase detecta la sesión; guardamos el rol para usarlo en la navegación.
+      global.rolUsuario = rol;
     } catch (error) {
       console.error('Error de inicio de sesión:', error.code, error.message);
       let errorMessage = "Hubo un problema al iniciar sesión.";
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: '#b9770e',
+    borderColor: 'rgb(210, 174, 109)',
     marginBottom: 20,
     width: '100%',
   },

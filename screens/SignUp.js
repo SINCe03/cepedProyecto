@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { auth } from '../src/config/firebaseConfig';
+import { auth, db } from '../src/config/firebaseConfig';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function SignUp({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -60,11 +61,24 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\s\S]{8
       return;
     }
 
-    try {
+        try {
       await updateProfile(credential.user, { displayName: `${firstName.trim()} ${lastName.trim()}` });
+    } catch (error) {
+      console.error('No se pudo guardar el nombre:', error);
+    }
+
+    try {
+      await setDoc(doc(db, 'usuarios', credential.user.uid), {
+        nombre: firstName.trim(),
+        apellido: lastName.trim(),
+        email: email.trim(),
+        rol: 'usuario',
+        fechaAlta: new Date().toISOString(),
+      });
       Alert.alert("Registro exitoso", "Usuario registrado con éxito.");
     } catch (error) {
-      Alert.alert("Cuenta creada", "La cuenta se creó, pero no se pudo guardar el nombre.");
+      console.error('Error al guardar el rol:', error);
+      Alert.alert("Cuenta creada", "La cuenta se creó, pero hubo un problema al guardar tus datos.");
     }
     // Firebase inicia la sesión y el navegador muestra Home.
   };
@@ -178,7 +192,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: '#b9770e',
+    borderColor: 'rgb(210, 174, 109)',
     marginBottom: 20,
     width: '100%',
   },
