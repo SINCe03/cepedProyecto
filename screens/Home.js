@@ -1,60 +1,42 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
-import { signOut } from 'firebase/auth';
-import { auth } from '../src/config/firebaseConfig';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 
-export default function Home({ navigation }) {
-
-  const handleLogOut = async () => {
-    try {
-      await signOut(auth);  
-      Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
-      // El observador de Firebase muestra Login al cerrar la sesión.
-    } catch (error) {
-      Alert.alert("Error", "Hubo un problema al cerrar sesión.");
-    }
-  };
-
-  return (
-    <View style={styles.container}>
+export default function Home() {
+  return(
+    <ScrollView contentContainerStyle={styles.container}>
       <Image source={require('../assets/logo.jpg')} style={styles.logo} resizeMode="contain" />
-      <Text style={styles.title}>Bienvenido a la aplicación</Text>
-      <TouchableOpacity style={styles.button} onPress={handleLogOut}>
-        <Text style={styles.buttonText}>Cerrar sesión</Text>
-      </TouchableOpacity>
-    </View>
-  );
+      <Text style={styles.title}>Bienvenido a CePED</Text>
+      <Text style={styles.mission}>
+        Nucleamos a institutos privados de educación a distancia de Salta. Promovemos, coordinamos, representamos y defendemos los intereses comunes de los mismos, fomentando la calidad y el reconocimiento de la educación a distancia como una opción educativa válida.
+      </Text>
+    </ScrollView>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    flexGrow: 1,
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: 24,
+    paddingTop: 60,
+    backgroundColor: '#F4F6FA',
   },
   logo: {
-    width: '85%',
+    width: '80%',
     height: 100,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: 'rgb(41, 61, 85)',
+    marginBottom: 16,
+    textAlign: 'center',
   },
-  button: {
-    backgroundColor: 'rgb(41, 61, 85)',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  mission: {
+    fontSize: 15,
+    color: '#5B6579',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
-

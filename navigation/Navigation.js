@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../src/config/firebaseConfig';
 import Login from '../screens/Login';
 import SignUp from '../screens/SignUp';
-import Institutos from '../screens/Institutos';
+import Institutos from './Tabs';
 
 const Stack = createStackNavigator();
 
@@ -50,13 +50,10 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {user ? (
-          <Stack.Screen
-            name="Institutos"
-            component={Institutos}
-            options={{ title: 'Institutos afiliados' }}
-            initialParams={{ isAdmin: rol === 'admin' }}
-          />
+                {user ? (
+          <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+            {() => <Tabs isAdmin={rol === 'admin'} />}
+          </Stack.Screen>
         ) : (
           <>
             <Stack.Screen name="Login" component={Login} options={{ title: 'Iniciar sesión' }} />
