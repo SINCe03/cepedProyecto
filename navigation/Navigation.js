@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../src/config/firebaseConfig';
 import Login from '../screens/Login';
 import SignUp from '../screens/SignUp';
-import Institutos from './Tabs';
+import Tabs from './Tabs';
 
 const Stack = createStackNavigator();
 

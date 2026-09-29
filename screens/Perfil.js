@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, ScrollView, KeyboardAvoidingView, Plataform } from 'react-native';
-import {FontAwesome5} from '@expo/vector-icons';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import {signOut, updateprofile} from 'firebase/auth';
 import {auth} from '../src/config/firebaseConfig';
 
