@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../src/config/firebaseConfig';
@@ -47,8 +47,9 @@ export default function Login({ navigation }) {
     }
   };
 
-  return (
-    <View style={styles.container}>
+    return (
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Image source={require('../assets/logo.jpg')} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Iniciar sesión</Text>
 
@@ -87,13 +88,14 @@ export default function Login({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
       </TouchableOpacity>
-    </View>
+        </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

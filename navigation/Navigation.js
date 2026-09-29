@@ -1,54 +1,119 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, isFirebaseConfigured } from '../src/config/firebaseConfig';
-import Login from '../screens/Login';
-import SignUp from '../screens/SignUp';
-import Home from '../screens/Home';
+import React, { useState } from 'react'; 
+import {View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import {FontAwesome} from '@expo/vector-icons';
+import {signOut} from 'firebase/auth' ;
+import {auth} from '../firebase/firebaseConfig';
 
-const Stack = createStackNavigator();
 
-export default function Navigation() {
-  const [user, setUser] = useState(undefined);
+const  datosIniciales = [
 
-  useEffect(() => {
-    if (!auth) return;
-    return onAuthStateChanged(auth, setUser);
-  }, []);
+  {id: '1', nombre: 'CEDSa', localidad: 'SALTA - Capital' }
+  ,{id: '2', nombre: 'teclab', localidad: 'SALTA - Capital' }
+  ,{id: '3', nombre: 'ITSalta', localidad: 'SALTA - Capital' }
+]
 
-  if (!isFirebaseConfigured) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.message}>
-          Falta configurar Firebase. Copia .env.example como .env y completa los datos de tu proyecto.
-        </Text>
-      </View>
+export default function Institutos({route, navigation} ) {
+
+  const isAdmin = route.params?.isAdmin ?? false;
+  const [ institutos, setInstitutions ] = useState(datosIniciales);
+  const [ busqueda, setBusqueda ] = useState('');
+
+  const filtrados = institutos.filter((i) => 
+    i.localidad.toLowerCase().includes(busqueda.toLowerCase())
+  );
+  const handleLogOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      Alert.alert("Error", "Hubo un problema al cerrar sesion")
+    }
+  };
+
+  const handleEliminar = (id, nombre) => {
+    Alert.alert(
+      "Eliminar",
+      `¿Está seguro que desea eliminar ${nombre}?`,
+      [
+        {text: "Cancelar", style: "cancel"},
+        {text: "Eliminar", style: "destructive", onPress: () => {
+          setInstitutos((prev) => prev.filter((i) => i.id !== id));
+        }},
+      ]
     );
-  }
-
-  if (user === undefined) {
-    return <View style={styles.center}><ActivityIndicator size="large" /></View>;
-  }
+  };
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {user ? (
-          <Stack.Screen name="Home" component={Home} options={{ title: 'Inicio' }} />
-        ) : (
-          <>
-            <Stack.Screen name="Login" component={Login} options={{ title: 'Iniciar sesión' }} />
-            <Stack.Screen name="SignUp" component={SignUp} options={{ title: 'Registro' }} />
-          </>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}> Institutos Registrados </Text>
+        <TouchableOpacity onPress={handleLogOut}>
+          <FontAwesome name="sign-out" size={22} color="rgb(41, 61, 85)" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.searchBox}>
+        <FontAwesome name="search" size={16} color= "#8A8078" style={{ marginRight: 8 }} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar por localidad"
+          value={busqueda}
+          onChangeText={setBusqueda}
+        />
+      </View>
+
+      {isAdmin && (
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Aca va el formulario de alta')}>
+          <FontAwesome name="plus" size={14} color="#fff" />
+          <Text style={styles.addbutton}> Agregar nuevo afiliado</Text>
+        </TouchableOpacity>
+      )}
+
+      <FlatList
+        data={filtrados}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{paddingBottom: 20}}
+        renderItem={({item}) => (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{item.nombre}</Text>
+            <View Style={styles.cardRow}>
+          </View>
+            <View style={styles.actions}>
+              <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert(item.nombre, item.localidad)}>
+                <FontAwesome name="eye" size={14} color="rgb(41, 61, 85)" />
+                <Text style={styles.actionText}> Ver</Text>
+              </TouchableOpacity>
+              {isAdmin && (
+                <>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert("Próximamente", "Acá va el formulario de edición.")}>
+                    <FontAwesome name="pencil" size={14} color="rgb(41, 61, 85)" />
+                    <Text style={styles.actionText}> Editar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => handleEliminar(item.id, item.nombre)}>
+                    <FontAwesome name="trash" size={14} color="#B3261E" />
+                    <Text style={[styles.actionText, { color: '#B3261E' }]}> Eliminar</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
         )}
-      </Stack.Navigator>
-    </NavigationContainer>
+      />
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  message: { textAlign: 'center', fontSize: 16 },
-});
+  const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: '#F4F6FA', padding: 16 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  title: { fontSize: 20, fontWeight: 'bold', color: 'rgb(41, 61, 85)' },
+  searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: '#DDE2ED', paddingHorizontal: 14, height: 42, marginBottom: 12 },
+  searchInput: { flex: 1 },
+  addButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D2AE6D', borderRadius: 10, paddingVertical: 10, marginBottom: 14 },
+  addButtonText: { color: '#fff', fontWeight: 'bold' },
+  card: { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#DDE2ED' },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A2233' },
+  cardRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  cardSub: { fontSize: 13, color: '#5B6579' },
+  actions: { flexDirection: 'row', marginTop: 10, gap: 16 },
+  actionBtn: { flexDirection: 'row', alignItems: 'center' },
+  actionText: { fontSize: 13, color: 'rgb(41, 61, 85)' },
+  })
