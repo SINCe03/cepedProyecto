@@ -103,7 +103,7 @@ export default function Institutos({ route, navigation }) {
             <Text style={styles.cardSub}>  {item.localidad}</Text>
             </View>
             <View style={styles.actions}>
-            <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert(item.nombre, item.localidad)}>
+            <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.getParent()?.navigate('DetalleInstituto', { instituto: item })}>    
                 <FontAwesome name="eye" size={14} color="rgb(41, 61, 85)" />
                 <Text style={styles.actionText}> Ver</Text>
             </TouchableOpacity>
