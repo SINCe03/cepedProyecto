@@ -8,6 +8,7 @@ import { auth, db, isFirebaseConfigured } from '../src/config/firebaseConfig';
 import Login from '../screens/Login';
 import SignUp from '../screens/SignUp';
 import Tabs from './Tabs';
+import FormularioInstituto from '../screens/FormularioInstituto';
 
 const Stack = createStackNavigator();
 
@@ -50,10 +51,22 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-                {user ? (
-          <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-            {() => <Tabs isAdmin={rol === 'admin'} />}
-          </Stack.Screen>
+        {user ? (
+          <>
+            <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+              {() => <Tabs isAdmin={rol === 'admin'} />}
+            </Stack.Screen>
+            <Stack.Screen
+              name="FormularioInstituto"
+              component={FormularioInstituto}
+              options={{
+                title: 'Instituto',
+                headerStyle: { backgroundColor: 'rgb(41, 61, 85)' },
+                headerTintColor: '#fff',
+                presentation: 'modal',
+              }}
+            />
+          </>
         ) : (
           <>
             <Stack.Screen name="Login" component={Login} options={{ title: 'Iniciar sesión' }} />

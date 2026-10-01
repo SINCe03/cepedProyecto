@@ -1,46 +1,70 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signOut } from 'firebase/auth';
-import { auth } from '../src/config/firebaseConfig';
+import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { auth, db } from '../src/config/firebaseConfig';
 
-const datosIniciales = [
-{ id: '1', nombre: 'CEDSa', localidad: 'SALTA - Capital' },
-{ id: '2', nombre: 'teclab', localidad: 'SALTA - Capital' },
-{ id: '3', nombre: 'ITSalta', localidad: 'SALTA - Capital' },
-];
+export default function Institutos({ route, navigation }) {
+    const isAdmin = route.params?.isAdmin ?? false;
+    const [institutos, setInstitutos] = useState([]);
+    const [cargando, setCargando] = useState(true);
+    const [busqueda, setBusqueda] = useState('');
 
-export default function Institutos({ route }) {
-const isAdmin = route.params?.isAdmin ?? false;
-const [institutos, setInstitutos] = useState(datosIniciales);
-const [busqueda, setBusqueda] = useState('');
+    useEffect(() => {
+    const unsub = onSnapshot(
+    collection(db, 'institutos'),
+    (snapshot) => {
+        const lista = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setInstitutos(lista);
+        setCargando(false);
+    },
+    (error) => {
+        console.error('Error al leer institutos:', error);
+        setCargando(false);
+        }
+    );
+    return unsub;
+}, []);
 
-const filtrados = institutos.filter((i) =>
-    i.localidad.toLowerCase().includes(busqueda.toLowerCase())
+    const filtrados = institutos.filter((i) =>
+    (i.localidad ?? '').toLowerCase().includes(busqueda.toLowerCase())
 );
 
-const handleLogOut = async () => {
+    const handleLogOut = async () => {
     try {
-    await signOut(auth);
+        await signOut(auth);
     } catch (error) {
-    Alert.alert("Error", "Hubo un problema al cerrar sesión.");
+        Alert.alert("Error", "Hubo un problema al cerrar sesión.");
     }
 };
 
-const handleEliminar = (id, nombre) => {
+    const handleEliminar = (id, nombre) => {
     Alert.alert(
-    "Eliminar",
-    `¿Seguro que querés eliminar ${nombre}?`,
-    [
+        "Eliminar",
+        `¿Seguro que querés eliminar ${nombre}?`,
+        [
         { text: "Cancelar", style: "cancel" },
-        { text: "Eliminar", style: "destructive", onPress: () => {
-        setInstitutos((prev) => prev.filter((i) => i.id !== id));
+        { text: "Eliminar", style: "destructive", onPress: async () => {
+        try {
+            await deleteDoc(doc(db, 'institutos', id));
+        } catch (error) {
+            Alert.alert("Error", "No se pudo eliminar el instituto.");
+        }
         }},
     ]
     );
 };
 
-return (
+    if (cargando) {
+    return (
+    <View style={styles.center}>
+        <ActivityIndicator size="large" color="rgb(41, 61, 85)" />
+    </View>
+    );
+}
+
+    return (
     <View style={styles.container}>
     <View style={styles.header}>
         <Text style={styles.title}>Institutos afiliados</Text>
@@ -60,9 +84,9 @@ return (
     </View>
 
         {isAdmin && (
-        <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert("Próximamente", "Acá va el formulario de alta.")}>
-            <FontAwesome name="plus" size={14} color="#fff" />
-            <Text style={styles.addButtonText}>  Agregar nuevo afiliado</Text>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.getParent()?.navigate('FormularioInstituto')}>
+        <FontAwesome name="plus" size={14} color="#fff" />
+        <Text style={styles.addButtonText}>  Agregar nuevo afiliado</Text>
         </TouchableOpacity>
     )}
 
@@ -70,39 +94,41 @@ return (
         data={filtrados}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 20 }}
+        ListEmptyComponent={<Text style={styles.empty}>No hay institutos que coincidan con la búsqueda.</Text>}
         renderItem={({ item }) => (
         <View style={styles.card}>
             <Text style={styles.cardTitle}>{item.nombre}</Text>
             <View style={styles.cardRow}>
-                <FontAwesome name="map-marker" size={14} color="#8A8078" />
-                <Text style={styles.cardSub}>  {item.localidad}</Text>
+            <FontAwesome name="map-marker" size={14} color="#8A8078" />
+            <Text style={styles.cardSub}>  {item.localidad}</Text>
             </View>
             <View style={styles.actions}>
-                <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert(item.nombre, item.localidad)}>
+            <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert(item.nombre, item.localidad)}>
                 <FontAwesome name="eye" size={14} color="rgb(41, 61, 85)" />
                 <Text style={styles.actionText}> Ver</Text>
-                </TouchableOpacity>
-                {isAdmin && (
+            </TouchableOpacity>
+            {isAdmin && (
                 <>
-                    <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert("Próximamente", "Acá va el formulario de edición.")}>
-                    <FontAwesome name="pencil" size={14} color="rgb(41, 61, 85)" />
-                    <Text style={styles.actionText}> Editar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionBtn} onPress={() => handleEliminar(item.id, item.nombre)}>
-                    <FontAwesome name="trash" size={14} color="#B3261E" />
-                    <Text style={[styles.actionText, { color: '#B3261E' }]}> Eliminar</Text>
-                    </TouchableOpacity>
+                <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.getParent()?.navigate('FormularioInstituto', { instituto: item })}>
+                <FontAwesome name="pencil" size={14} color="rgb(41, 61, 85)" />
+                <Text style={styles.actionText}> Editar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionBtn} onPress={() => handleEliminar(item.id, item.nombre)}>
+                <FontAwesome name="trash" size={14} color="#B3261E" />
+                <Text style={[styles.actionText, { color: '#B3261E' }]}> Eliminar</Text>
+                </TouchableOpacity>
                 </>
             )}
             </View>
-            </View>
+        </View>
         )}
-        />
+    />
     </View>
 );
 }
 
 const styles = StyleSheet.create({
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F6FA' },
     container: { flex: 1, backgroundColor: '#F4F6FA', padding: 16 },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
     title: { fontSize: 20, fontWeight: 'bold', color: 'rgb(41, 61, 85)' },
@@ -117,4 +143,5 @@ const styles = StyleSheet.create({
     actions: { flexDirection: 'row', marginTop: 10, gap: 16 },
     actionBtn: { flexDirection: 'row', alignItems: 'center' },
     actionText: { fontSize: 13, color: 'rgb(41, 61, 85)' },
+    empty: { textAlign: 'center', color: '#8A8078', marginTop: 30 },
 });

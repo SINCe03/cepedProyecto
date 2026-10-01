@@ -86,7 +86,7 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\s\S]{8
     return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Image source={require('../assets/logo.jpg')} style={styles.logo} resizeMode="contain"/>
+      <Image source={require('../assets/LOGOCEPED.png')} style={styles.logo} resizeMode="contain"/>
       <Text style={styles.title}>Regístrate</Text>
 
       <Text style={styles.label}>Nombre</Text>

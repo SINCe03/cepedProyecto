@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 export default function Home() {
   return(
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={require('../assets/logo.jpg')} style={styles.logo} resizeMode="contain" />
+      <Image source={require('../assets/LOGOCEPED.png')} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Bienvenido a CePED</Text>
       <Text style={styles.mission}>
         Nucleamos a institutos privados de educación a distancia de Salta. Promovemos, coordinamos, representamos y defendemos los intereses comunes de los mismos, fomentando la calidad y el reconocimiento de la educación a distancia como una opción educativa válida.
