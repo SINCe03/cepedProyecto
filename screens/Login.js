@@ -76,10 +76,14 @@ export default function Login({ navigation }) {
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color="#ccc" />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+        <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color="#ccc" />
+      </TouchableOpacity>
       </View>
+
+      <TouchableOpacity onPress={() => navigation.navigate('RecuperarContrasena')} style={styles.forgotWrap}>
+        <Text style={styles.forgotText}>Olvidé mi contraseña</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Ingresar</Text>
@@ -88,7 +92,7 @@ export default function Login({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
       </TouchableOpacity>
-        </ScrollView>
+    </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -125,8 +129,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%',
   },
-  icon: {
-    marginRight: 10,
+    forgotWrap: {
+    alignSelf: 'flex-end',
+    marginTop: -12,
+    marginBottom: 8,
+  },
+  forgotText: {
+    color: 'rgb(41, 61, 85)',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
   input: {
     flex: 1,

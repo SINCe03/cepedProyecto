@@ -7,6 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../src/config/firebaseConfig';
 import Login from '../screens/Login';
 import SignUp from '../screens/SignUp';
+import RecuperarContrasena from '../screens/RecuperarContrasena';
 import Tabs from './Tabs';
 import FormularioInstituto from '../screens/FormularioInstituto';
 import DetalleInstituto from '../screens/DetalleInstituto';
@@ -74,10 +75,11 @@ export default function Navigation() {
 />
           </>
         ) : (
-          <>
-            <Stack.Screen name="Login" component={Login} options={{ title: 'Iniciar sesión' }} />
-            <Stack.Screen name="SignUp" component={SignUp} options={{ title: 'Registro' }} />
-          </>
+        <>
+          <Stack.Screen name="Login" component={Login} options={{ title: 'Iniciar sesión' }} />
+          <Stack.Screen name="SignUp" component={SignUp} options={{ title: 'Registro' }} />
+          <Stack.Screen name="RecuperarContrasena" component={RecuperarContrasena} options={{ headerShown: false }} />
+        </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
