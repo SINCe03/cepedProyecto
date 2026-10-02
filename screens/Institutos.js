@@ -19,10 +19,11 @@ export default function Institutos({ route, navigation }) {
         setInstitutos(lista);
         setCargando(false);
     },
-    (error) => {
+        (error) => {
+        if (error.code === 'permission-denied') return;
         console.error('Error al leer institutos:', error);
         setCargando(false);
-        }
+    }
     );
     return unsub;
 }, []);

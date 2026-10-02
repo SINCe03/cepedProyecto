@@ -27,12 +27,19 @@ export default function Home({ navigation }) {
     };
     cargarUsuario();
 
-    const unsub = onSnapshot(collection(db, 'institutos'), (snapshot) => {
+    const unsub = onSnapshot(
+    collection(db, 'institutos'),
+    (snapshot) => {
       const lista = snapshot.docs.map((d) => d.data());
       setTotalInstitutos(lista.length);
       const localidades = new Set(lista.map((i) => i.localidad).filter(Boolean));
       setTotalLocalidades(localidades.size);
-    });
+    },
+    (error) => {
+      if (error.code === 'permission-denied') return;
+      console.error('Error al leer institutos:', error);
+  }
+);
     return unsub;
   }, []);
 
@@ -62,7 +69,7 @@ export default function Home({ navigation }) {
         </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Acceso rápido</Text>
+      <Text style={styles.sectionTitle}>Acceso rapido</Text>
       <View style={styles.quickRow}>
         <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Afiliados')}>
           <FontAwesome name="building" size={20} color="rgb(41, 61, 85)" />
@@ -83,14 +90,14 @@ export default function Home({ navigation }) {
       </View>
 
             <View style={styles.missionCard}>
-        <Text style={styles.sectionTitle}>Nuestra misión</Text>
+        <Text style={styles.sectionTitle}>Nuestra mision</Text>
         <Text style={styles.mission}>
           Nucleamos a institutos privados de educación a distancia de Salta. Promovemos, coordinamos, representamos y defendemos los intereses comunes de los mismos, fomentando la calidad y el reconocimiento de la educación a distancia como una opción educativa válida.
         </Text>
       </View>
 
       <View style={styles.missionCard}>
-        <Text style={styles.sectionTitle}>Nuestra visión</Text>
+        <Text style={styles.sectionTitle}>Nuestra vision</Text>
         <Text style={styles.mission}>
           Lograr el reconocimiento público de la red como referente del sector, organizando un Congreso Internacional de Educación a Distancia e impulsando la incorporación de todos los institutos privados de la provincia de Salta a la asociación.
         </Text>
