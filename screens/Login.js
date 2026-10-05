@@ -58,7 +58,7 @@ export default function Login({ navigation }) {
         <FontAwesome name="envelope" size={20} color="#ccc" style={styles.icon} />
         <TextInput
           style={styles.input}
-          placeholder="Ingrese su correo"
+          placeholder="user@email.com"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
