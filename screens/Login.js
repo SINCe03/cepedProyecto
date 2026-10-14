@@ -4,6 +4,12 @@ import { FontAwesome } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../src/config/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
+import AuthHeader from '../Components/AuthHeader';
+import Toast from 'react-native-toast-message';
+import FormInput from '../Components/FormInput';
+import { Mail, Lock } from 'lucide-react-native';
+import Button from '../Components/Button'
+import BubbleDecor from '../Components/BubbleDecor';
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
@@ -12,16 +18,16 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      Alert.alert("Error", "Por favor ingrese ambos campos.");
-      return;
-    }
+    Toast.show({ type: 'error', text1: 'Faltan datos', text2: 'Por favor ingresá ambos campos.' });
+    return;
+  }
 
-        try {
-      const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
-      const snap = await getDoc(doc(db, 'usuarios', credential.user.uid));
-      const rol = snap.exists() ? snap.data().rol : 'usuario';
-      // El observador de Firebase detecta la sesión; guardamos el rol para usarlo en la navegación.
-      global.rolUsuario = rol;
+    try {
+    const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
+    const snap = await getDoc(doc(db, 'usuarios', credential.user.uid));
+    const rol = snap.exists() ? snap.data().rol : 'usuario';
+    // El observador de Firebase detecta la sesión; guardamos el rol para usarlo en la navegación.
+    global.rolUsuario = rol;
     } catch (error) {
       console.error('Error de inicio de sesión:', error.code, error.message);
       let errorMessage = "Hubo un problema al iniciar sesión.";
@@ -43,85 +49,67 @@ export default function Login({ navigation }) {
           errorMessage = "La clave API de Firebase no es válida. Revisa el archivo .env.";
           break;
       }
-      Alert.alert("Error", `${errorMessage}\n\nCódigo: ${error.code ?? 'desconocido'}`);
+        Toast.show({ type: 'error', text1: 'No pudimos iniciar sesión', text2: errorMessage });
     }
   };
 
-    return (
+  return (
+    <View style={styles.screen}>
+    <BubbleDecor />
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Image source={require('../assets/LOGOCEPED.png')} style={styles.logo} resizeMode="contain" />
-      <Text style={styles.title}>Iniciar sesión</Text>
+      <AuthHeader title="Iniciar sesión" subtitle="Accedé a tu cuenta para continuar" />
 
-      <Text style={styles.label}>Correo</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="envelope" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="user@email.com"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
-
-      <Text style={styles.label}>Contraseña</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="lock" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su contraseña"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-        />
-      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-        <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color="#ccc" />
-      </TouchableOpacity>
-      </View>
+      <View style={styles.form}>
+      <FormInput Icon={Mail} label="Correo electrónico" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none"  />
+      <FormInput Icon={Lock} label="Contraseña" value={password} onChangeText={setPassword} secureTextEntry />
 
       <TouchableOpacity onPress={() => navigation.navigate('RecuperarContrasena')} style={styles.forgotWrap}>
         <Text style={styles.forgotText}>Olvidé mi contraseña</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Ingresar</Text>
-      </TouchableOpacity>
+      <Button title="Ingresar" onPress={handleLogin} />
 
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.signUpText}>¿No tienes cuenta aún? Regístrate</Text>
       </TouchableOpacity>
+      </View>
     </ScrollView>
     </KeyboardAvoidingView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+  const styles = StyleSheet.create({
+    screen: {
+    flex: 1,
     backgroundColor: '#fff',
   },
-  logo: {
+    container: {
+    flexGrow: 1,
+  },
+    form: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    alignItems: 'center',
+  },
+    logo: {
     width: '85%',
     height: 100,
     marginBottom: 20,
   },
-  title: {
+    title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  label: {
+    label: {
     alignSelf: 'flex-start',
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
   },
-  inputContainer: {
+    inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
@@ -129,10 +117,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%',
   },
-    forgotWrap: {
+  forgotWrap: {
     alignSelf: 'flex-end',
-    marginTop: -12,
-    marginBottom: 8,
+    marginTop: 10,
+    marginBottom: 4,
   },
   forgotText: {
     color: 'rgb(41, 61, 85)',
@@ -157,6 +145,7 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     marginTop: 20,
-    color: '#007AFF',
+    color: 'rgb(41, 61, 85)',
+    fontWeight: 'bold',
   },
 });

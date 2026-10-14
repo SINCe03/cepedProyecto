@@ -1,15 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signOut } from 'firebase/auth';
-import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { auth, db } from '../src/config/firebaseConfig';
+import Toast from 'react-native-toast-message';
+import Button from '../Components/Button';
 
 export default function Institutos({ route, navigation }) {
     const isAdmin = route.params?.isAdmin ?? false;
     const [institutos, setInstitutos] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [busqueda, setBusqueda] = useState('');
+    const [refrescando, setRefrescando] = useState(false);
+
+    const handleRefrescar = async () => {
+    setRefrescando(true);
+    try {
+        const snap = await getDocs(collection(db, 'institutos'));
+        setInstitutos(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    } catch (error) {
+        console.error('Error al refrescar:', error);
+    } finally {
+        setRefrescando(false);
+    }
+};
 
     useEffect(() => {
     const unsub = onSnapshot(
@@ -35,8 +50,8 @@ export default function Institutos({ route, navigation }) {
     const handleLogOut = async () => {
     try {
         await signOut(auth);
-    } catch (error) {
-        Alert.alert("Error", "Hubo un problema al cerrar sesión.");
+        } catch (error) {
+        Toast.show({ type: 'error', text1: 'No se pudo cerrar sesión' });
     }
 };
 
@@ -46,11 +61,12 @@ export default function Institutos({ route, navigation }) {
         `¿Seguro que querés eliminar ${nombre}?`,
         [
         { text: "Cancelar", style: "cancel" },
-        { text: "Eliminar", style: "destructive", onPress: async () => {
+                { text: "Eliminar", style: "destructive", onPress: async () => {
         try {
             await deleteDoc(doc(db, 'institutos', id));
+            Toast.show({ type: 'success', text1: 'Instituto eliminado' });
         } catch (error) {
-            Alert.alert("Error", "No se pudo eliminar el instituto.");
+            Toast.show({ type: 'error', text1: 'No se pudo eliminar el instituto' });
         }
         }},
     ]
@@ -84,18 +100,29 @@ export default function Institutos({ route, navigation }) {
         />
     </View>
 
-        {isAdmin && (
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.getParent()?.navigate('FormularioInstituto')}>
-        <FontAwesome name="plus" size={14} color="#fff" />
-        <Text style={styles.addButtonText}>  Agregar nuevo afiliado</Text>
-        </TouchableOpacity>
-    )}
+    {isAdmin && (
+        <Button
+            title="Agregar nuevo afiliado"
+            onPress={() => navigation.getParent()?.navigate('FormularioInstituto')}
+            variant="gold"
+            icon={<FontAwesome name="plus" size={14} color="#fff" />}
+        />
+)}
 
     <FlatList
+        style={{ marginTop: 35 }}
         data={filtrados}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={<Text style={styles.empty}>No hay institutos que coincidan con la búsqueda.</Text>}
+        refreshControl={
+            <RefreshControl
+            refreshing={refrescando}
+            onRefresh={handleRefrescar}
+            tintColor="rgb(41, 61, 85)"
+            colors={['rgb(41, 61, 85)']}
+            />
+        }
         renderItem={({ item }) => (
         <View style={styles.card}>
             <Text style={styles.cardTitle}>{item.nombre}</Text>

@@ -4,6 +4,12 @@ import { FontAwesome } from '@expo/vector-icons';
 import { auth, db } from '../src/config/firebaseConfig';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import AuthHeader from '../Components/AuthHeader';
+import Toast from 'react-native-toast-message';
+import FormInput from '../Components/FormInput';
+import { User, Mail, Lock } from 'lucide-react-native';
+import Button from '../Components/Button';
+import BubbleDecor from '../Components/BubbleDecor';
 
 export default function SignUp({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -16,21 +22,22 @@ export default function SignUp({ navigation }) {
 
   const handleSignUp = async () => {
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
-      Alert.alert("Error", "Todos los campos son obligatorios.");
+      Toast.show({ type: 'error', text1: 'Faltan datos', text2: 'Todos los campos son obligatorios.' });
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Las contraseñas no coinciden.");
+      Toast.show({ type: 'error', text1: 'Revisá la contraseña', text2: 'Las contraseñas no coinciden.' });
       return;
     }
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\s\S]{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\s\S]{8,}$/;
     if (!passwordRegex.test(password)) {
-    
-      Alert.alert(
-        "Error",
-        "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial."
-      );
+
+      Toast.show({
+      type: 'error',
+      text1: 'Contraseña débil',
+      text2: 'Mínimo 8 caracteres, con mayúscula, minúscula, número y carácter especial.',
+      });
       return;
     }
 
@@ -57,11 +64,11 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\s\S]{8
           errorMessage = "La clave API de Firebase no es válida. Revisa el archivo .env.";
           break;
       }
-      Alert.alert("Error", `${errorMessage}\n\nCódigo: ${error.code ?? 'desconocido'}`);
+      Toast.show({ type: 'error', text1: 'No pudimos registrarte', text2: errorMessage });
       return;
     }
 
-        try {
+    try {
       await updateProfile(credential.user, { displayName: `${firstName.trim()} ${lastName.trim()}` });
     } catch (error) {
       console.error('No se pudo guardar el nombre:', error);
@@ -75,104 +82,52 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\s\S]{8
         rol: 'usuario',
         fechaAlta: new Date().toISOString(),
       });
-      Alert.alert("Registro exitoso", "Usuario registrado con éxito.");
+      Toast.show({ type: 'success', text1: '¡Bienvenido/a!', text2: 'Tu cuenta se creó correctamente.' });
     } catch (error) {
       console.error('Error al guardar el rol:', error);
-      Alert.alert("Cuenta creada", "La cuenta se creó, pero hubo un problema al guardar tus datos.");
+      Toast.show({ type: 'error', text1: 'Cuenta creada', text2: 'Hubo un problema al guardar tus datos.' });
     }
     // Firebase inicia la sesión y el navegador muestra Home.
   };
 
-    return (
+      return (
+    <View style={styles.screen}>
+    <BubbleDecor />
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Image source={require('../assets/LOGOCEPED.png')} style={styles.logo} resizeMode="contain"/>
-      <Text style={styles.title}>Regístrate</Text>
+      <AuthHeader title="Crear cuenta" subtitle="Completá tus datos para registrarte" />
 
-      <Text style={styles.label}>Nombre</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="user" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su nombre"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
-      </View>
+      <View style={styles.form}>
+      <FormInput Icon={User} label="Nombre" value={firstName} onChangeText={setFirstName} />
+      <FormInput Icon={User} label="Apellido" value={lastName} onChangeText={setLastName} />
+      <FormInput Icon={Mail} label="Correo electrónico" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+      <FormInput Icon={Lock} label="Contraseña" value={password} onChangeText={setPassword} secureTextEntry />
+      <FormInput Icon={Lock} label="Confirmar contraseña" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
 
-      <Text style={styles.label}>Apellido</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="user" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su apellido"
-          value={lastName}
-          onChangeText={setLastName}
-        />
-      </View>
-
-      <Text style={styles.label}>Correo</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="envelope" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su correo"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
-
-      <Text style={styles.label}>Contraseña</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="lock" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su contraseña"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-        />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color="#ccc" />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.label}>Confirmar Contraseña</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="lock" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirme su contraseña"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={!showConfirmPassword}
-        />
-        <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-          <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color="#ccc" />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Registrarse</Text>
-      </TouchableOpacity>
+      <Button title="Registrarse" onPress={handleSignUp} />
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
       </TouchableOpacity>
-        </ScrollView>
+      </View>
+    </ScrollView>
     </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+  flex: 1,
+  backgroundColor: '#fff',
+  },
   container: {
-    flexGrow: 1,
-    justifyContent: 'center',
+  flexGrow: 1,
+  },
+  form: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
   },
   logo: {
     width: '85%',
@@ -217,8 +172,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  signUpText: {
+    signUpText: {
     marginTop: 20,
-    color: '#007AFF',
+    color: 'rgb(41, 61, 85)',
+    fontWeight: 'bold',
   },
 });

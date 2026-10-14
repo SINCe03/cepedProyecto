@@ -28,10 +28,16 @@ export default function DetalleInstituto({ route }) {
         </View>
     )}
 
-        {!!instituto.carreras && (
+    {!!(instituto.carreras && instituto.carreras.length) && (
         <View style={styles.card}>
-            <Text style={styles.cardLabel}>Carreras / cursos a distancia</Text>
-            <Text style={styles.cardText}>{instituto.carreras}</Text>
+        <Text style={styles.cardLabel}>Carreras / cursos a distancia</Text>
+        <View style={styles.carrerasWrap}>
+            {(Array.isArray(instituto.carreras) ? instituto.carreras : [instituto.carreras]).map((carrera) => (
+        <View key={carrera} style={styles.carreraChip}>
+            <Text style={styles.carreraChipText}>{carrera}</Text>
+        </View>
+            ))}
+        </View>
         </View>
     )}
 
@@ -79,6 +85,12 @@ const styles = StyleSheet.create({
     card: { backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#DDE2ED', padding: 16, marginBottom: 14 },
     cardLabel: { fontSize: 12, fontWeight: 'bold', color: '#D2AE6D', textTransform: 'uppercase', marginBottom: 6 },
     cardText: { fontSize: 15, color: '#1A2233', lineHeight: 21 },
+    carrerasWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    carreraChip: {
+    backgroundColor: '#F4F6FA', borderWidth: 1, borderColor: '#DDE2ED',
+    borderRadius: 20, paddingVertical: 6, paddingHorizontal: 12,
+},
+    carreraChipText: { fontSize: 13, color: 'rgb(41, 61, 85)', fontWeight: '600' },
     contactRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
     icon: { marginRight: 10, width: 18 },
     contactText: { fontSize: 15, color: 'rgb(41, 61, 85)', textDecorationLine: 'underline' },

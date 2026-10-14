@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import FormInput from '../Components/FormInput';
+import { Building2, MapPin, FileText, Phone, Mail, Globe } from 'lucide-react-native';
+import Toast from 'react-native-toast-message';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../src/config/firebaseConfig';
+import Button from '../Components/Button';
 
 const LOCALIDADES = [
     'Salta Capital',
@@ -19,6 +23,19 @@ const LOCALIDADES = [
     'General Güemes',
 ];
 
+const CARRERAS_DISPONIBLES = [
+    'Analista de Sistemas',
+    'Administración de Empresas',
+    'Contador Público',
+    'Abogacía',
+    'Martillero y Corredor Público',
+    'Profesorado en Educación',
+    'Psicología',
+    'Recursos Humanos',
+    'Marketing Digital',
+    'Diseño Gráfico',
+];
+
 export default function FormularioInstituto({ route, navigation }) {
     const instituto = route.params?.instituto;
     const editando = !!instituto;
@@ -27,15 +44,27 @@ export default function FormularioInstituto({ route, navigation }) {
     const [localidad, setLocalidad] = useState(instituto?.localidad ?? LOCALIDADES[0]);
     const [direccion, setDireccion] = useState(instituto?.direccion ?? '');
     const [descripcion, setDescripcion] = useState(instituto?.descripcion ?? '');
-    const [carreras, setCarreras] = useState(instituto?.carreras ?? '');
+    const [carreras, setCarreras] = useState(() => {
+    if (Array.isArray(instituto?.carreras)) return instituto.carreras;
+    if (typeof instituto?.carreras === 'string' && instituto.carreras.trim()) {
+        return instituto.carreras.split(',').map((c) => c.trim());
+    }
+    return [];
+});
     const [telefono, setTelefono] = useState(instituto?.telefono ?? '');
     const [email, setEmail] = useState(instituto?.email ?? '');
     const [sitioWeb, setSitioWeb] = useState(instituto?.sitioWeb ?? '');
     const [guardando, setGuardando] = useState(false);
 
+    const toggleCarrera = (carrera) => {
+    setCarreras((prev) =>
+        prev.includes(carrera) ? prev.filter((c) => c !== carrera) : [...prev, carrera]
+    );
+};
+
     const handleGuardar = async () => {
     if (!nombre.trim()) {
-        Alert.alert("Error", "El nombre del instituto es obligatorio.");
+        Toast.show({ type: 'error', text1: 'Falta el nombre', text2: 'El nombre del instituto es obligatorio.' });
         return;
     }
     setGuardando(true);
@@ -44,43 +73,41 @@ export default function FormularioInstituto({ route, navigation }) {
         localidad,
         direccion: direccion.trim(),
         descripcion: descripcion.trim(),
-        carreras: carreras.trim(),
+        carreras,
         telefono: telefono.trim(),
         email: email.trim(),
         sitioWeb: sitioWeb.trim(),
     };
     try {
-        if (editando) {
+    if (editando) {
         await updateDoc(doc(db, 'institutos', instituto.id), datos);
     } else {
         await addDoc(collection(db, 'institutos'), datos);
     }
-    navigation.goBack();
+        navigation.goBack();
+        Toast.show({ type: 'success', text1: editando ? 'Cambios guardados' : 'Instituto agregado' });
     } catch (error) {
         console.error('Error al guardar el instituto:', error);
-        Alert.alert("Error", "No se pudo guardar el instituto.");
+        Toast.show({ type: 'error', text1: 'No se pudo guardar', text2: 'Intentá de nuevo.' });
     } finally {
-    setGuardando(false);
+        setGuardando(false);
     }
 };
 
     return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>{editando ? 'Editar afiliado' : 'Agregar nuevo afiliado'}</Text>
 
-        <Text style={styles.label}>Nombre del instituto *</Text>
-        <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder="Ej: CEDSa" value={nombre} onChangeText={setNombre} />
-        </View>
+        <FormInput Icon={Building2} label="Nombre del instituto *" value={nombre} onChangeText={setNombre} />
 
         <Text style={styles.label}>Localidad</Text>
         <View style={styles.pickerContainer}>
-            <Picker selectedValue={localidad} onValueChange={setLocalidad}>
+        <Picker selectedValue={localidad} onValueChange={setLocalidad}>
             {LOCALIDADES.map((loc) => (
-                <Picker.Item key={loc} label={loc} value={loc} />
+        <Picker.Item key={loc} label={loc} value={loc} />
             ))}
-            </Picker>
+        </Picker>
         </View>
 
         <Text style={styles.label}>Dirección</Text>
@@ -88,53 +115,32 @@ export default function FormularioInstituto({ route, navigation }) {
             <TextInput style={styles.input} placeholder="Ej: Av. Belgrano 123" value={direccion} onChangeText={setDireccion} />
         </View>
 
-        <Text style={styles.label}>Descripción</Text>
-        <View style={[styles.inputContainer, styles.inputMultiline]}>
-            <TextInput
-            style={[styles.input, styles.multiline]}
-            placeholder="Breve descripción del instituto"
-            value={descripcion}
-            onChangeText={setDescripcion}
-            multiline
-            numberOfLines={3}
-        />
-        </View>
+        <FormInput Icon={MapPin} label="Dirección" value={direccion} onChangeText={setDireccion} />
+        <FormInput Icon={FileText} label="Descripción" value={descripcion} onChangeText={setDescripcion} multiline />
 
         <Text style={styles.label}>Carreras / cursos a distancia</Text>
-        <View style={[styles.inputContainer, styles.inputMultiline]}>
-            <TextInput
-            style={[styles.input, styles.multiline]}
-            placeholder="Ej: Analista de Sistemas, Martillero Público"
-            value={carreras}
-            onChangeText={setCarreras}
-            multiline
-            numberOfLines={2}
-        />
-        </View>
-
-        <Text style={styles.label}>Teléfono</Text>
-        <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder="Ej: 387 555 0123" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
-        </View>
-
-        <Text style={styles.label}>Email de contacto</Text>
-        <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder="Ej: contacto@instituto.edu.ar" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-        </View>
-
-        <Text style={styles.label}>Sitio web</Text>
-        <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder="Ej: https://instituto.edu.ar" value={sitioWeb} onChangeText={setSitioWeb} autoCapitalize="none" />
-        </View>
-
-        <TouchableOpacity style={styles.button} onPress={handleGuardar} disabled={guardando}>
-            <Text style={styles.buttonText}>{guardando ? 'Guardando...' : 'Guardar'}</Text>
+        <View style={styles.chipsWrap}>
+            {CARRERAS_DISPONIBLES.map((carrera) => {
+            const selected = carreras.includes(carrera);
+            return (
+        <TouchableOpacity
+            key={carrera}
+            style={[styles.chip, selected && styles.chipSelected]}
+            onPress={() => toggleCarrera(carrera)}
+        >
+            <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{carrera}</Text>
         </TouchableOpacity>
+            );
+        })}
+        </View>
 
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelText}>Cancelar</Text>
-        </TouchableOpacity>
-        </ScrollView>
+        <FormInput Icon={Phone} label="Teléfono" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
+        <FormInput Icon={Mail} label="Email de contacto" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+        <FormInput Icon={Globe} label="Sitio web" value={sitioWeb} onChangeText={setSitioWeb} autoCapitalize="none" />
+
+        <Button title="Guardar" onPress={handleGuardar} loading={guardando} />
+        <Button title="Cancelar" onPress={() => navigation.goBack()} variant="outline" />
+    </ScrollView>
     </KeyboardAvoidingView>
 );
 }
@@ -150,6 +156,14 @@ const styles = StyleSheet.create({
     inputMultiline: { height: undefined, paddingVertical: 10 },
     input: { fontSize: 15 },
     multiline: { textAlignVertical: 'top' },
+    chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 4 },
+    chip: {
+    borderWidth: 1, borderColor: '#DDE2ED', borderRadius: 20,
+    paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#fff',
+},
+    chipSelected: { backgroundColor: 'rgb(41, 61, 85)', borderColor: 'rgb(41, 61, 85)' },
+    chipText: { fontSize: 13, color: '#1A2233' },
+    chipTextSelected: { color: '#fff', fontWeight: 'bold' },
     pickerContainer: {
     backgroundColor: '#fff', borderWidth: 1, borderColor: '#DDE2ED', borderRadius: 10,
     overflow: 'hidden',
