@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, RefreshControl } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
 import { signOut } from 'firebase/auth';
 import { collection, onSnapshot, deleteDoc, doc, getDocs } from 'firebase/firestore';
@@ -8,6 +9,7 @@ import Toast from 'react-native-toast-message';
 import Button from '../Components/Button';
 
 export default function Institutos({ route, navigation }) {
+    const insets = useSafeAreaInsets();
     const isAdmin = route.params?.isAdmin ?? false;
     const [institutos, setInstitutos] = useState([]);
     const [cargando, setCargando] = useState(true);
@@ -82,7 +84,7 @@ export default function Institutos({ route, navigation }) {
 }
 
     return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
     <View style={styles.header}>
         <Text style={styles.title}>Institutos afiliados</Text>
         <TouchableOpacity onPress={handleLogOut}>
@@ -157,7 +159,7 @@ export default function Institutos({ route, navigation }) {
 
 const styles = StyleSheet.create({
     center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F6FA' },
-    container: { flex: 1, backgroundColor: '#F4F6FA', padding: 16 },
+    container: { flex: 1, backgroundColor: '#F4F6FA', paddingHorizontal: 16, paddingBottom: 16 },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
     title: { fontSize: 20, fontWeight: 'bold', color: 'rgb(41, 61, 85)' },
     searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 24, borderWidth: 1, borderColor: '#DDE2ED', paddingHorizontal: 14, height: 42, marginBottom: 12 },

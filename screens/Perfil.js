@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Image, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '../Components/FormInput';
 import { User, Mail, Phone } from 'lucide-react-native';
@@ -12,6 +13,7 @@ import { auth, db } from '../src/config/firebaseConfig';
 import Button from '../Components/Button';
 
 export default function Perfil() {
+    const insets = useSafeAreaInsets();
     const user = auth.currentUser;
     const [cargando, setCargando] = useState(true);
     const [editando, setEditando] = useState(false);
@@ -145,7 +147,7 @@ const handleGuardar = async () => {
 
     return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 16 }]} keyboardShouldPersistTaps="handled">
         <TouchableOpacity style={styles.avatarWrap} onPress={handleCambiarFoto} disabled={subiendoFoto}>
         <View style={styles.avatar}>
             {foto ? (
@@ -207,7 +209,7 @@ const handleGuardar = async () => {
 
 const styles = StyleSheet.create({
     center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F6FA' },
-    container: { flexGrow: 1, alignItems: 'center', padding: 24, paddingTop: 50, backgroundColor: '#F4F6FA' },
+    container: { flexGrow: 1, alignItems: 'center', padding: 24, backgroundColor: '#F4F6FA' },
     avatarWrap: { position: 'relative' },
     avatar: {
     width: 84, height: 84, borderRadius: 42, backgroundColor: 'rgb(41, 61, 85)',

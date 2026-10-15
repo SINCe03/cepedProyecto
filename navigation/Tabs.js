@@ -13,8 +13,7 @@ return (
         screenOptions={{
         tabBarActiveTintColor: 'rgb(41, 61, 85)',
         tabBarInactiveTintColor: '#8A8078',
-        headerStyle: { backgroundColor: 'rgb(41, 61, 85)' },
-        headerTintColor: '#fff',
+        headerShown: false,
     }}
     >
         <Tab.Screen
@@ -22,7 +21,7 @@ return (
         component={Home}
         options={{
             tabBarIcon: ({ color, size }) => <FontAwesome name="home" size={size} color={color} />,
-        }}
+    }}
     />
         <Tab.Screen
         name="Afiliados"
@@ -31,14 +30,14 @@ return (
         options={{
             title: 'Institutos afiliados',
             tabBarIcon: ({ color, size }) => <FontAwesome name="building" size={size} color={color} />,
-        }}
+    }}
     />
         <Tab.Screen
         name="Perfil"
         component={Perfil}
         options={{
             tabBarIcon: ({ color, size }) => <FontAwesome name="user" size={size} color={color} />,
-        }}
+    }}
     />
     </Tab.Navigator>
 );

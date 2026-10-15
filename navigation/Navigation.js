@@ -66,12 +66,13 @@ export default function Navigation() {
             headerStyle: { backgroundColor: 'rgb(41, 61, 85)' },
             headerTintColor: '#fff',
             presentation: 'modal',
+            headerBackTitlevisible: false,
           }}
         />
         <Stack.Screen
           name="DetalleInstituto"
           component={DetalleInstituto}
-          options={{ title: 'Detalle del instituto', headerStyle: { backgroundColor: 'rgb(41, 61, 85)' }, headerTintColor: '#fff' }}
+          options={{ title: 'Detalle del instituto', headerStyle: { backgroundColor: 'rgb(41, 61, 85)' }, headerTintColor: '#fff', headerBackTitlevisible: false }}
 />
           </>
         ) : (
