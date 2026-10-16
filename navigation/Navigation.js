@@ -58,21 +58,22 @@ export default function Navigation() {
         <Stack.Screen name="Tabs" options={{ headerShown: false }}>
         {() => <Tabs isAdmin={rol === 'admin'} />}
         </Stack.Screen>
-        <Stack.Screen
-          name="FormularioInstituto"
-          component={FormularioInstituto}
-          options={{
+          <Stack.Screen
+            name="FormularioInstituto"
+            component={FormularioInstituto}
+            options={{
             title: 'Instituto',
             headerStyle: { backgroundColor: 'rgb(41, 61, 85)' },
             headerTintColor: '#fff',
             presentation: 'modal',
-            headerBackTitlevisible: false,
+            headerBackTitleVisible: false,
+            headerBackTitle: '',
           }}
         />
         <Stack.Screen
           name="DetalleInstituto"
           component={DetalleInstituto}
-          options={{ title: 'Detalle del instituto', headerStyle: { backgroundColor: 'rgb(41, 61, 85)' }, headerTintColor: '#fff', headerBackTitlevisible: false }}
+          options={{ title: 'Detalle del instituto', headerStyle: { backgroundColor: 'rgb(41, 61, 85)' }, headerTintColor: '#fff', headerBackTitleVisible: false, headerBackTitle: '' }}
 />
           </>
         ) : (

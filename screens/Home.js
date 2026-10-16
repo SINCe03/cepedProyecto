@@ -43,12 +43,19 @@ export default function Home({ navigation }) {
     };
     cargarUsuario();
 
-    const unsubInstitutos = onSnapshot(collection(db, 'institutos'), (snapshot) => {
+      const unsubInstitutos = onSnapshot(
+      collection(db, 'institutos'),
+      (snapshot) => {
       const lista = snapshot.docs.map((d) => d.data());
       setTotalInstitutos(lista.length);
       const localidades = new Set(lista.map((i) => i.localidad).filter(Boolean));
       setTotalLocalidades(localidades.size);
-    });
+      },
+      (error) => {
+        if (error.code === 'permission-denied') return;
+        console.error('Error al leer institutos:', error);
+      }
+    );
 
     const qEventos = query(
       collection(db, 'eventos'),
@@ -56,9 +63,16 @@ export default function Home({ navigation }) {
       orderBy('fecha'),
       limit(3)
     );
-    const unsubEventos = onSnapshot(qEventos, (snapshot) => {
+    const unsubEventos = onSnapshot(
+      qEventos,
+      (snapshot) => {
       setEventos(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
+      },
+      (error) => {
+        if (error.code === 'permission-denied') return;
+        console.error('Error al leer eventos:', error);
+      }
+    );
 
     return () => {
       unsubInstitutos();

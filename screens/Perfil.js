@@ -173,16 +173,16 @@ const handleGuardar = async () => {
         {!editando ? (
         <>
         <View style={styles.infoCard}>
-        <View style={styles.infoRow}>
-            <FontAwesome name="user" size={16} color="#8A8078" style={styles.icon} />
+            <View style={styles.infoRow}>
+            <User size={16} color="#8A8078" strokeWidth={2} style={styles.icon} />
             <Text style={styles.infoText}>{nombre} {apellido}</Text>
-        </View>
+            </View>
         <View style={styles.infoRow}>
-                <FontAwesome name="envelope" size={16} color="#8A8078" style={styles.icon} />
-                <Text style={styles.infoText}>{user?.email}</Text>
+            <Mail size={16} color="#8A8078" strokeWidth={2} style={styles.icon} />
+            <Text style={styles.infoText}>{user?.email}</Text>
         </View>
         <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-            <FontAwesome name="phone" size={16} color="#8A8078" style={styles.icon} />
+            <Phone size={16} color="#8A8078" strokeWidth={2} style={styles.icon} />
             <Text style={styles.infoText}>{telefono || 'Sin teléfono cargado'}</Text>
         </View>
         </View>
