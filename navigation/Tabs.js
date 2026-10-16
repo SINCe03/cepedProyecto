@@ -4,6 +4,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import Home from '../screens/Home';
 import Institutos from '../screens/Institutos';
 import Perfil from '../screens/Perfil';
+import ContactoScreen from '../screens/Contacto';
 
 const Tab = createBottomTabNavigator();
 
@@ -40,6 +41,16 @@ return (
             tabBarIcon: ({ color, size }) => <FontAwesome name="user" size={size} color={color} />,
         }}
     />
+        <Tab.Screen 
+        name="Contacto" 
+        component={ContactoScreen} 
+        options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+        <FontAwesome name="envelope" size={size} color={color} />
+    ),
+    }}
+/>
     </Tab.Navigator>
 );
 }

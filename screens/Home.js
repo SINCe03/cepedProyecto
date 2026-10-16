@@ -87,6 +87,11 @@ export default function Home({ navigation }) {
           <FontAwesome name="user" size={20} color="rgb(41, 61, 85)" />
           <Text style={styles.quickText}>Mi perfil</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Contacto')}>
+          <FontAwesome name="envelope" size={20} color="rgb(41, 61, 85)" />
+          <Text style={styles.quickText}>Contacto</Text>
+        </TouchableOpacity>
       </View>
 
             <View style={styles.missionCard}>
