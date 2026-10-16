@@ -74,7 +74,7 @@ export default function SignUp({ navigation }) {
       console.error('No se pudo guardar el nombre:', error);
     }
 
-    try {
+    try {  
       await setDoc(doc(db, 'usuarios', credential.user.uid), {
         nombre: firstName.trim(),
         apellido: lastName.trim(),
