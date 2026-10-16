@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Image, Alert } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FontAwesome } from '@expo/vector-icons';
 import FormInput from '../Components/FormInput';
-import { User, Mail, Phone } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';;
+import { User, Mail, Phone, camera } from 'lucide-react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import Toast from 'react-native-toast-message';
@@ -162,7 +162,7 @@ const handleGuardar = async () => {
             )}
         </View>
         <View style={styles.cameraBadge}>
-        <FontAwesome name="camera" size={13} color="#fff" />
+        <FontAwesome name="camera" size={14} color="#fff" />      
         </View>
         </TouchableOpacity>
         <Text style={styles.changePhotoText}>Cambiar foto</Text>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home as HomeIcon, Building2, UserCircle } from 'lucide-react-native';
+import { Home as HomeIcon, Building2, UserCircle, Mail } from 'lucide-react-native';
 import Home from '../screens/Home';
 import Institutos from '../screens/Institutos';
 import Perfil from '../screens/Perfil';
+import ContactoScreen from '../screens/Contacto';
+import { FontAwesome } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -39,6 +41,14 @@ return (
             tabBarIcon: ({ color, size }) => <UserCircle size={size} color={color} strokeWidth={2} />,
     }}
     />
+        <Tab.Screen 
+        name="Contacto" 
+        component={ContactoScreen} 
+        options={{
+            tabBarIcon: ({ color, size }) => <Mail size={size} color={color} strokeWidth={2} />,
+        }}
+        
+/>
     </Tab.Navigator>
 );
 }

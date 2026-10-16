@@ -110,11 +110,6 @@ export default function FormularioInstituto({ route, navigation }) {
         </Picker>
         </View>
 
-        <Text style={styles.label}>Dirección</Text>
-        <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder="Ej: Av. Belgrano 123" value={direccion} onChangeText={setDireccion} />
-        </View>
-
         <FormInput Icon={MapPin} label="Dirección" value={direccion} onChangeText={setDireccion} />
         <FormInput Icon={FileText} label="Descripción" value={descripcion} onChangeText={setDescripcion} multiline />
 

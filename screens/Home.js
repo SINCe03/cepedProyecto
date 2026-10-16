@@ -5,6 +5,7 @@ import {
   Bell, Search, Users, Plus, UserCircle, CalendarDays,
   Clock, ChevronRight, GraduationCap, TrendingUp, Building2,
 } from 'lucide-react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { collection, onSnapshot, doc, getDoc, query, where, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../src/config/firebaseConfig';
@@ -184,6 +185,16 @@ export default function Home({ navigation }) {
             <Text style={styles.quickText}>Agregar</Text>
           </TouchableOpacity>
         )}
+
+        <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Perfil')}>
+          <FontAwesome name="user" size={20} color="rgb(41, 61, 85)" />
+          <Text style={styles.quickText}>Mi perfil</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Contacto')}>
+          <FontAwesome name="envelope" size={20} color="rgb(41, 61, 85)" />
+          <Text style={styles.quickText}>Contacto</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.sectionHead}>
